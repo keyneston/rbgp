@@ -1,43 +1,24 @@
+pub mod error;
 pub mod header;
+pub mod open;
 
-/*
-# Open Message
+pub use error::*;
+pub use header::*;
+pub use open::*;
 
-```
-0                   1                   2                   3
-0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-+-+-+-+-+-+-+-+-+
-|    Version    |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|     My Autonomous System      |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|           Hold Time           |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                         BGP Identifier                        |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-| Opt Parm Len  |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-|             Optional Parameters (variable)                    |
-|                                                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-```
-[Source](https://tools.ietf.org/html/rfc4271#section-4.2)
-*/
+///////////
+// Types //
+///////////
 
-pub struct Open {
-    pub version: u8,
-    pub my_as: u16,
-    pub hold_time: u16,
-    pub bgp_identifier: u32,
-    pub opt_parm_len: u8,
-    pub optional_parameters: Vec<u8>,
-}
+/// ASN is an autonomous system number.
+type ASN = u16;
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works2() {
-        assert_eq!(2 + 2, 4);
-    }
+/// MessageType represents what the type of message is. These are encoded as
+/// u8s when sending a message to another BGP Peer.
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
+pub enum MessageType {
+    Open = 1,
+    Update = 2,
+    Notification = 3,
+    KeepAlive = 4,
 }
