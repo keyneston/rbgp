@@ -35,7 +35,7 @@ where
     }
 }
 
-impl<'a T> From<Err<T>> for Error
+impl<T> From<Err<T>> for Error
 where
     T: std::fmt::Debug,
 {

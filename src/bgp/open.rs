@@ -1,11 +1,7 @@
 extern crate nom;
 use super::*;
 use nom::{
-    bytes::streaming::{tag, take},
-    combinator::map_res,
-    number::streaming::be_u8,
-    sequence::tuple,
-    IResult,
+    number::streaming::be_u16, number::streaming::be_u32, number::streaming::be_u8, IResult,
 };
 
 /// # Open Message
@@ -44,9 +40,24 @@ pub struct Open {
 
 impl Open {
     pub fn from_bytes(input: &[u8]) -> Result<Open, Error> {
-        let (input, version) = be_u8(input)?;
+        let (input, version) = be_u8::<(_, nom::error::ErrorKind)>(input)?;
+        let (input, my_asn) = be_u16::<(_, nom::error::ErrorKind)>(input)?;
+        let (input, hold_time) = be_u16::<(_, nom::error::ErrorKind)>(input)?;
+        let (input, bgp_identifier) = be_u32::<(_, nom::error::ErrorKind)>(input)?;
+        let (input, opt_parm_len) = be_u8::<(_, nom::error::ErrorKind)>(input)?;
 
-        unimplemented!()
+        if opt_parm_len != 0 {
+            panic!("optional parameters are not yet supported");
+        }
+
+        Ok(Open {
+            version: version,
+            my_as: my_asn as ASN,
+            hold_time: hold_time,
+            bgp_identifier: bgp_identifier,
+            opt_parm_len: opt_parm_len,
+            optional_parameters: None,
+        })
     }
 
     fn write_packet(&self) {
@@ -62,9 +73,13 @@ mod tests {
 
     #[test]
     fn test_from_bytes() {
-        let open = Open::from_bytes(b"").unwrap();
-        // TODO
+        let open = Open::from_bytes(b"\x04\xFB\xFF\x01\x00\x00\x00\x00\x16\x00\x00").unwrap();
+
         assert_eq!(open.version, 4);
         assert_eq!(open.my_as, DOCUMENTATION_ASN);
+        assert_eq!(open.hold_time, 256);
+        assert_eq!(open.bgp_identifier, 22);
+        assert_eq!(open.opt_parm_len, 0);
+        // TODO: add optional parms
     }
 }
