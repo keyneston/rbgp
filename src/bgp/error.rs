@@ -41,6 +41,12 @@ impl From<std::io::Error> for Error {
     }
 }
 
+impl From<String> for Error {
+    fn from(error: String) -> Error {
+        Error { message: error }
+    }
+}
+
 // impl<T> From<T> for Error
 // where
 //     T: std::fmt::Debug,
