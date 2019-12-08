@@ -1,5 +1,3 @@
-use nom::{error::VerboseError, Err};
-
 pub struct Error {
     message: String,
 }
@@ -24,24 +22,33 @@ impl fmt::Debug for Error {
     }
 }
 
-impl<T> From<VerboseError<T>> for Error
-where
-    T: std::fmt::Debug,
-{
-    fn from(error: VerboseError<T>) -> Self {
+// impl<T> From<VerboseError<T>> for Error
+// where
+// T: std::fmt::Debug,
+// {
+// fn from(error: VerboseError<T>) -> Self {
+// Error {
+// message: format!("{:?}", error),
+// }
+// }
+// }
+
+impl From<std::io::Error> for Error {
+    fn from(error: std::io::Error) -> Error {
         Error {
             message: format!("{:?}", error),
         }
     }
 }
 
-impl<T> From<Err<T>> for Error
-where
-    T: std::fmt::Debug,
-{
-    fn from(error: Err<T>) -> Self {
-        Error {
-            message: format!("{:?}", error),
-        }
-    }
-}
+// impl<T> From<T> for Error
+// where
+//     T: std::fmt::Debug,
+// {
+//     fn from(error: T) -> Self {
+//         Error {
+//             message: format!("{:?}", error),
+//         }
+//     }
+// }
+//

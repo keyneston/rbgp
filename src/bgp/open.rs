@@ -1,8 +1,6 @@
-extern crate nom;
 use super::*;
-use nom::{
-    number::streaming::be_u16, number::streaming::be_u32, number::streaming::be_u8, IResult,
-};
+use std::io::Cursor;
+use tokio::io::{self, AsyncBufReadExt, AsyncRead, AsyncReadExt, AsyncWriteExt, BufStream};
 
 /// # Open Message
 ///
@@ -39,12 +37,14 @@ pub struct Open {
 }
 
 impl Open {
-    pub fn from_bytes(input: &[u8]) -> Result<Open, Error> {
-        let (input, version) = be_u8::<(_, nom::error::ErrorKind)>(input)?;
-        let (input, my_asn) = be_u16::<(_, nom::error::ErrorKind)>(input)?;
-        let (input, hold_time) = be_u16::<(_, nom::error::ErrorKind)>(input)?;
-        let (input, bgp_identifier) = be_u32::<(_, nom::error::ErrorKind)>(input)?;
-        let (input, opt_parm_len) = be_u8::<(_, nom::error::ErrorKind)>(input)?;
+    pub async fn from_bytes<T: AsyncBufReadExt + Sized + Unpin>(
+        input: &mut T,
+    ) -> Result<Open, Error> {
+        let version = input.read_u8().await?;
+        let my_asn = input.read_u16().await?;
+        let hold_time = input.read_u16().await?;
+        let bgp_identifier = input.read_u32().await?;
+        let opt_parm_len = input.read_u8().await?;
 
         if opt_parm_len != 0 {
             panic!("optional parameters are not yet supported");
@@ -68,12 +68,17 @@ impl Open {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use tokio::io::*;
 
     const DOCUMENTATION_ASN: ASN = 64511;
 
     #[test]
     fn test_from_bytes() {
-        let open = Open::from_bytes(b"\x04\xFB\xFF\x01\x00\x00\x00\x00\x16\x00\x00").unwrap();
+        let mut input = Cursor::new(b"\x04\xFB\xFF\x01\x00\x00\x00\x00\x16\x00\x00");
+        let open = tokio::runtime::Runtime::new()
+            .unwrap()
+            .block_on(Open::from_bytes(&mut input))
+            .unwrap();
 
         assert_eq!(open.version, 4);
         assert_eq!(open.my_as, DOCUMENTATION_ASN);
