@@ -21,9 +21,11 @@ pub struct Session {
 }
 
 pub async fn handle(mut socket: TcpStream) -> Result<(), Error> {
-    &print!("Accepted connection from {:?}", socket.peer_addr(),);
+    println!("Accepted connection from {:?}", socket.peer_addr(),);
 
     let message = Message::from_bytes(&mut socket).await?;
+
+    println!("Got message from neighbor: {:?}", message);
 
     let open = match message {
         Message::Open(o) => o,
@@ -45,7 +47,7 @@ pub async fn handle(mut socket: TcpStream) -> Result<(), Error> {
 
     println!("Got: {:?}", session);
 
-    print!("Finished connection from {:?}", socket.peer_addr());
+    println!("Finished connection from {:?}", socket.peer_addr());
 
     Ok(())
 }
