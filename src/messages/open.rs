@@ -1,6 +1,5 @@
 use super::*;
-use std::io::Cursor;
-use tokio::io::{self, AsyncBufReadExt, AsyncRead, AsyncReadExt, AsyncWriteExt, BufStream};
+use tokio::io::{self, AsyncRead, AsyncReadExt, AsyncWriteExt, BufStream};
 
 /// # Open Message
 ///
@@ -27,6 +26,7 @@ use tokio::io::{self, AsyncBufReadExt, AsyncRead, AsyncReadExt, AsyncWriteExt, B
 /// ```
 /// [Source](https://tools.ietf.org/html/rfc4271#section-4.2)
 
+#[derive(Debug, Clone)]
 pub struct Open {
     pub version: u8,
     pub my_as: ASN,
@@ -37,9 +37,7 @@ pub struct Open {
 }
 
 impl Open {
-    pub async fn from_bytes<T: AsyncBufReadExt + Sized + Unpin>(
-        input: &mut T,
-    ) -> Result<Open, Error> {
+    pub async fn from_bytes<T: AsyncReadExt + Sized + Unpin>(input: &mut T) -> Result<Open, Error> {
         let version = input.read_u8().await?;
         let my_asn = input.read_u16().await?;
         let hold_time = input.read_u16().await?;
@@ -68,6 +66,7 @@ impl Open {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::io::Cursor;
     use tokio::io::*;
 
     const DOCUMENTATION_ASN: ASN = 64511;

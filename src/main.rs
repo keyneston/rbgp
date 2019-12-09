@@ -1,10 +1,10 @@
-mod bgp;
+mod messages;
 
 use chrono::Utc;
 use futures::StreamExt;
 //use std::io::{self, Write};
 use std::time::Duration;
-use tokio::io;
+use tokio::io::AsyncReadExt;
 use tokio::net::{TcpListener, TcpStream};
 use tokio::prelude::*;
 use tokio::time::delay_for;
@@ -47,17 +47,9 @@ async fn handler(mut socket: TcpStream) {
         socket.peer_addr(),
     ));
 
-    let mut buf = [0; 1024];
-    match socket.read(&mut buf).await {
-        // socket closed
-        Ok(n) => {
-            io::stdout().write_all(&buf[0..n]).await;
-        }
-        Err(e) => {
-            println!("failed to read from socket; err = {:?}", e);
-            return;
-        }
-    };
+    let message = messages::Message::from_bytes(&mut socket).await.unwrap();
+    println!("Got: {:?}", message);
+
     delay_for(t).await;
 
     log_entry(&format!(

@@ -1,5 +1,5 @@
 use super::*;
-use tokio::io::{AsyncBufReadExt, AsyncReadExt};
+use tokio::io::AsyncReadExt;
 
 /// # Route
 /// ```text
@@ -33,6 +33,8 @@ use tokio::io::{AsyncBufReadExt, AsyncReadExt};
 ///    of trailing bits is irrelevant.
 /// ```
 /// [Source](https://tools.ietf.org/html/rfc4271#section-4.3)
+
+#[derive(Debug, Clone)]
 pub struct Route {
     // TODO: turn this prefix into a native type
     pub prefix: Vec<u8>,
@@ -40,7 +42,7 @@ pub struct Route {
 
 impl Route {
     #[allow(dead_code)]
-    pub async fn from_bytes<T: AsyncBufReadExt + Sized + Unpin>(
+    pub async fn from_bytes<T: AsyncReadExt + Sized + Unpin>(
         input: &mut T,
     ) -> Result<Route, Error> {
         let length = input.read_u8().await?;

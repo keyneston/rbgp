@@ -4,6 +4,14 @@ pub struct Error {
 
 use std::fmt;
 
+impl Error {
+    pub fn new(input: &str) -> Error {
+        Error {
+            message: input.to_string(),
+        }
+    }
+}
+
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "An Error Occurred, Please Try Again!") // user-facing output

@@ -1,6 +1,6 @@
 use super::*;
 use route::Route;
-use tokio::io::{AsyncBufReadExt, AsyncReadExt};
+use tokio::io::AsyncReadExt;
 /// # Update Message
 ///
 /// ```text
@@ -17,16 +17,19 @@ use tokio::io::{AsyncBufReadExt, AsyncReadExt};
 /// +-----------------------------------------------------+
 /// ```
 /// [Source](https://tools.ietf.org/html/rfc4271#section-4.3)
+
+#[derive(Debug, Clone)]
 pub struct Update {
     withdrawn_routes: Vec<Route>,
     path_attributes: Vec<PathAttributes>,
 }
 
+#[derive(Debug, Clone)]
 pub struct PathAttributes {}
 
 impl Update {
     #[allow(dead_code)]
-    pub async fn from_bytes<T: AsyncBufReadExt + Sized + Unpin>(
+    pub async fn from_bytes<T: AsyncReadExt + Sized + Unpin>(
         input: &mut T,
     ) -> Result<Update, Error> {
         let withdrawn_count = input.read_u8().await?;
