@@ -29,9 +29,9 @@ use tokio::io::{self, AsyncRead, AsyncReadExt, AsyncWriteExt, BufStream};
 #[derive(Debug, Clone)]
 pub struct Open {
     pub version: u8,
-    pub my_as: ASN,
+    pub asn: ASN,
     pub hold_time: u16,
-    pub bgp_identifier: u32,
+    pub bgp_id: u32,
     pub opt_parm_len: u8,
     pub optional_parameters: Option<Vec<u8>>,
 }
@@ -39,9 +39,9 @@ pub struct Open {
 impl Open {
     pub async fn from_bytes<T: AsyncReadExt + Sized + Unpin>(input: &mut T) -> Result<Open, Error> {
         let version = input.read_u8().await?;
-        let my_asn = input.read_u16().await?;
+        let asn = input.read_u16().await?;
         let hold_time = input.read_u16().await?;
-        let bgp_identifier = input.read_u32().await?;
+        let bgp_id = input.read_u32().await?;
         let opt_parm_len = input.read_u8().await?;
 
         if opt_parm_len != 0 {
@@ -50,9 +50,9 @@ impl Open {
 
         Ok(Open {
             version: version,
-            my_as: my_asn as ASN,
+            asn: asn as ASN,
             hold_time: hold_time,
-            bgp_identifier: bgp_identifier,
+            bgp_id: bgp_id,
             opt_parm_len: opt_parm_len,
             optional_parameters: None,
         })
@@ -80,9 +80,9 @@ mod tests {
             .unwrap();
 
         assert_eq!(open.version, 4);
-        assert_eq!(open.my_as, DOCUMENTATION_ASN);
+        assert_eq!(open.asn, DOCUMENTATION_ASN);
         assert_eq!(open.hold_time, 256);
-        assert_eq!(open.bgp_identifier, 22);
+        assert_eq!(open.bgp_id, 22);
         assert_eq!(open.opt_parm_len, 0);
         // TODO: add optional parms
     }

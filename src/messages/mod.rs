@@ -16,4 +16,4 @@ pub use update::*;
 ///////////
 
 /// ASN is an autonomous system number.
-type ASN = u16;
+pub type ASN = u16;
