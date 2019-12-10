@@ -1,6 +1,6 @@
 use super::*;
 use std::io::Cursor;
-use tokio::io::AsyncReadExt;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 /// # Message Header
 ///
@@ -25,7 +25,7 @@ use tokio::io::AsyncReadExt;
 
 /// MessageType represents what the type of message is. These are encoded as
 /// u8s when sending a message to another BGP Peer.
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub enum MessageType {
     Open = 1,
     Update = 2,
@@ -40,6 +40,7 @@ pub struct Header {
     // Marker must have all bits set 1.
     marker: [u8; 16],
     message_type: MessageType,
+    length: u16,
     pub message: Option<Message>,
 }
 
@@ -49,6 +50,7 @@ impl Header {
             marker: [std::u8::MAX; 16],
             message_type: message_type,
             message: None,
+            length: length,
         }
     }
 
@@ -83,6 +85,16 @@ impl Header {
         };
 
         unimplemented!()
+    }
+    pub async fn write_bytes<T: AsyncWriteExt + Sized + Unpin>(
+        &self,
+        stream: &mut T,
+    ) -> Result<(), Error> {
+        stream.write(&self.marker).await?;
+        stream.write_u16(self.length).await?;
+        stream.write_u8(self.message_type as u8).await?;
+
+        Ok(())
     }
 }
 

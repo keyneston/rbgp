@@ -24,9 +24,9 @@ async fn main() {
         println!("Server is shutting down");
     } else {
         let addr = "localhost:2179";
-        let mut conn = TcpStream::connect(addr).await.unwrap();
 
-        rbgp::session::handle(conn).await.unwrap();
+        println!("Making connection to: {}", addr);
+        let connection = rbgp::connection::Connection::new(addr).await.unwrap();
     };
 }
 
