@@ -72,7 +72,7 @@ impl Header {
 
         input.read(&mut buffer).await?;
 
-        let message = match message_type {
+        let _message = match message_type {
             1 => {
                 let open = Open::from_bytes(&mut Cursor::new(buffer)).await?;
                 Message::Open(open)

@@ -16,7 +16,7 @@ impl ConnectionManager {
     }
 
     /// create_session will launch a session and add it to the connection manager.
-    pub fn create_session(&mut self, peer: &str) -> Result<(), Error> {
+    pub fn create_session(&mut self, _peer: &str) -> Result<(), Error> {
         unimplemented!()
     }
 }

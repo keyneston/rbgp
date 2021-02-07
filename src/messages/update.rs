@@ -60,7 +60,7 @@ impl Default for Update {
 mod tests {
     use super::*;
     use std::io::Cursor;
-    use tokio::io::*;
+    
 
     const DOCUMENTATION_ASN: ASN = 64511;
 

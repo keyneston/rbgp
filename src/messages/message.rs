@@ -1,5 +1,5 @@
 use super::{Error, Header, Open, Update};
-use tokio::io::{AsyncReadExt, AsyncWriteExt, BufStream};
+use tokio::io::{AsyncReadExt};
 
 /// MessageType represents what the type of message is. These are encoded as
 /// u8s when sending a message to another BGP Peer.

@@ -1,6 +1,6 @@
 extern crate byteorder;
 use super::*;
-use byteorder::BigEndian;
+
 use tokio::io::{self, AsyncRead, AsyncReadExt, AsyncWriteExt, BufStream};
 
 /// # Open Message
@@ -66,9 +66,9 @@ impl Open {
         let opt_parm_len_size = 8;
 
         // TODO: figure out the length of the actual optional params.
-        let opt_params_size = 0;
+        let _opt_params_size = 0;
 
-        return (version_size + asn_size + hold_time_size + bgp_id_size + opt_parm_len_size);
+        return version_size + asn_size + hold_time_size + bgp_id_size + opt_parm_len_size;
     }
 
     pub async fn write_bytes<T: AsyncWriteExt + Sized + Unpin>(
@@ -112,7 +112,7 @@ impl Default for Open {
 mod tests {
     use super::*;
     use std::io::Cursor;
-    use tokio::io::*;
+    
 
     const DOCUMENTATION_ASN: ASN = 64511;
 
